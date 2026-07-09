@@ -27,12 +27,19 @@ export class TaskInfoDialogParams {
   homeStore: HomeStore;
   achievementStore: AchievementStore;
   uIContext: UIContext;
+  // Invoked after a clock-in mutates the DB. It reassigns the @Consume homeStore
+  // reference inside the owning component (TaskListComponent), because @Consume
+  // re-renders ONLY on a reference change — it does NOT observe @Observed property
+  // mutations (only @ObjectLink does), so mutating homeStore.weekList/taskList in
+  // place would never refresh the UI.
+  refreshHomeStore: () => Promise<void>;
 
   constructor(dayTaskInfo: DayTaskInfo, homeStore: HomeStore, achievementStore: AchievementStore,
-    uIContext: UIContext) {
+    uIContext: UIContext, refreshHomeStore: () => Promise<void>) {
     this.dayTaskInfo = dayTaskInfo;
     this.homeStore = homeStore;
     this.achievementStore = achievementStore;
     this.uIContext = uIContext;
+    this.refreshHomeStore = refreshHomeStore;
   }
 }

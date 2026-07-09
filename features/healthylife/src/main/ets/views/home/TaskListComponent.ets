@@ -102,7 +102,10 @@ export struct TaskListComponent {
     })
     .onClick(() => {
       if (this.homeStore.checkCurrentDay()) {
-        let params = new TaskInfoDialogParams(item, this.homeStore, this.achievementStore, this.getUIContext());
+        let params = new TaskInfoDialogParams(item, this.homeStore, this.achievementStore, this.getUIContext(),
+          async () => {
+            this.homeStore = await updateTaskList(this.homeStore);
+          });
         openTaskClockCustomDialog(this.getUIContext(), params);
       }
     })
@@ -160,7 +163,7 @@ export struct TaskListComponent {
     }
 
     await TaskInfoApi.deleteTask(this.homeStore.currentDate, item.taskId);
-    await updateTaskList(this.homeStore);
+    this.homeStore = await updateTaskList(this.homeStore);
     this.getUIContext().getPromptAction().showToast({ message: $r('app.string.task_deleted') });
   }
 

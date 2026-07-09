@@ -16,21 +16,22 @@
  */
 
 import { HomeStore } from '../../viewmodel/HomeStore';
-import { CommonConstants as Const, DayInfo } from 'common';
+import { CommonConstants as Const } from 'common';
 import { WeekCalendarComponent } from './WeekCalendarComponent';
 
 @Component
 export struct HomeTopComponent {
-  @Consume @Watch('onDataChange') homeStore: HomeStore;
-  @State dayInfo: DayInfo = new DayInfo('', 0, 0);
-
-  onDataChange() {
-    this.dayInfo = this.homeStore.weekList[this.homeStore.selectedDay];
-  }
-
-  aboutToAppear(): void {
-    this.onDataChange();
-  }
+  // Read weekList[selectedDay] directly in build() instead of caching it into a
+  // @State via @Watch. Two reasons make this the correct pattern:
+  //  1. @Observed property mutations are only delivered to @ObjectLink, NOT to
+  //     @Consume — so mutating homeStore.weekList/taskList never refreshed here.
+  //  2. @Watch on a @Consume fires only when the homeStore REFERENCE changes.
+  // After a clock-in, updateTaskList now returns a NEW HomeStore instance that
+  // the caller assigns back to this.homeStore (TaskListComponent), so the
+  // reference changes, @Consume re-syncs, build() re-runs, and the latest
+  // weekList[selectedDay] (with refreshed finTaskNum) is read directly — no
+  // stale @State cache, no @Watch timing gap.
+  @Consume homeStore: HomeStore;
 
   build() {
     Column() {
@@ -45,7 +46,7 @@ export struct HomeTopComponent {
         })
 
       Row() {
-        Text(`${this.dayInfo.calculatePercentage()}`)
+        Text(`${this.homeStore.weekList[this.homeStore.selectedDay].calculatePercentage()}`)
           .fontFamily(Const.HARMONY_HEI_TI_BOLD)
           .fontWeight(FontWeight.Bold)
           .fontColor($r(`sys.color.font_primary`))

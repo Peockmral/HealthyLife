@@ -164,7 +164,7 @@ export struct EditTaskComponent {
         }
       }
     }
-    await updateTaskList(this.homeStore);
+    this.homeStore = await updateTaskList(this.homeStore);
     this.pageStack.clear(true);
   }
 

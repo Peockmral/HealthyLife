@@ -33,20 +33,6 @@ export default class EntryAbility extends UIAbility {
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }
-
-    // Init RDB connect and create tables
-    await RdbUtils.createRdb(this.context).then(() => {
-      for (let tableName of RdbConstants.TABLE_NAME_LIST) {
-        RdbUtils.createTable(tableName);
-      }
-    });
-    // Add the isRepeat column for legacy databases (no-op on fresh installs where create-table already includes it).
-    await TaskInfoApi.migrateIsRepeat();
-    await TaskInfoApi.checkDefaultTask();
-    // Init preferences and get store
-    await PreferencesUtils.getPreferencesFromStorage(this.context);
-    await DayInfoApi.initAchievementStoreByDayInfo(convertDate2Str(new Date()));
-
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
   }
 
@@ -55,9 +41,26 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void {
-    // Main window is created, set main page for this ability
+  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    // The UIAbility framework does NOT await an async onCreate, so loading the
+    // page here used to race the RDB init: HomeComponent.aboutToAppear ran
+    // initDayInfo (which inserts the today dayInfo row) BEFORE createRdb had
+    // finished, so rdbStore was still undefined and the insert silently no-op'd
+    // (rdbStore?.). That left today's dayInfo row missing forever, so the daily
+    // progress was stuck at 0% no matter how many tasks were clocked. Await ALL
+    // DB/preferences init here and ONLY THEN loadContent, so the store is ready
+    // and the today row exists before the home page renders.
+    await RdbUtils.createRdb(this.context);
+    for (let tableName of RdbConstants.TABLE_NAME_LIST) {
+      await RdbUtils.createTable(tableName);
+    }
+    // Add the isRepeat column for legacy databases (no-op on fresh installs where create-table already includes it).
+    await TaskInfoApi.migrateIsRepeat();
+    await TaskInfoApi.checkDefaultTask();
+    // Init preferences and get store
+    await PreferencesUtils.getPreferencesFromStorage(this.context);
+    await DayInfoApi.initAchievementStoreByDayInfo(convertDate2Str(new Date()));
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {

@@ -16,7 +16,6 @@
  */
 
 import { ComponentContent } from '@kit.ArkUI';
-import { updateTaskList } from '../../viewmodel/HomeStore';
 import TaskInfoApi from 'common/src/main/ets/database/tables/TaskInfoApi';
 import { updateAchievementStore } from '../../viewmodel/AchievementStore';
 import { TaskInfoDialogParams } from '../../viewmodel/dialog/TaskInfoDialogParams';
@@ -77,7 +76,7 @@ export function taskClockDialogBuilder(params: TaskInfoDialogParams) {
 async function taskClock(params: TaskInfoDialogParams) {
   if (!params.dayTaskInfo.isDone) {
     await TaskInfoApi.clockTask(params.dayTaskInfo.date, params.dayTaskInfo.taskId);
-    await updateTaskList(params.homeStore);
+    await params.refreshHomeStore();
   }
   PromptActionClass.closeDialog();
 

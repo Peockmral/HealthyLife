@@ -47,13 +47,13 @@ export class RdbUtils {
    * The method of creating a table.
    * @param { string } tableName the table name that needs to be created
    */
-  static createTable(tableName: string): void {
+  static async createTable(tableName: string): Promise<void> {
     if (!RdbUtils.rdbStore) {
       hilog.error(0x0000, TAG, 'RdbStore is undefined');
       return;
     }
     let createSql: string = RdbUtils.generateTableSql(tableName);
-    RdbUtils.rdbStore.execute(createSql)
+    await RdbUtils.rdbStore.execute(createSql)
       .then(() => {
         hilog.info(0x0000, TAG, `Execute create ${tableName} table sql success`);
       })

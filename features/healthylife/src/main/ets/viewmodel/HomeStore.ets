@@ -16,7 +16,7 @@
  */
 
 import {
-  CommonConstants as Const, convertDate2Str, DayInfo, DayTaskInfo
+  CommonConstants as Const, convertDate2Str, convertStr2Date, DayInfo, DayTaskInfo
 } from 'common';
 import DayInfoApi from 'common/src/main/ets/database/tables/DayInfoApi';
 import TaskInfoApi from 'common/src/main/ets/database/tables/TaskInfoApi';
@@ -79,29 +79,19 @@ export async function initCurrentDateInfo(date: Date): Promise<HomeStore> {
 }
 
 /*
- * Update the task list information in the global storage information.
+ * Re-query the home list / week list for the current date and return a NEW
+ * HomeStore instance. Callers MUST assign the result back to the @Consume
+ * homeStore (this.homeStore = await updateTaskList(this.homeStore)) so that the
+ * homeStore reference changes — that is the only change @Consume consumers
+ * (HomeTopComponent / TaskListComponent / WeekCalendarComponent) can observe.
+ * @Observed property mutations are only delivered to @ObjectLink, which these
+ * components do NOT use, so mutating weekList/taskList in place never refreshed
+ * the UI after a clock-in / open / close / delete.
  * @param { HomeStore } homeStore The global storage information.
- * @returns { Promise<void> }  A promise object.
+ * @returns { Promise<HomeStore> } A freshly-queried HomeStore instance.
  */
-export async function updateTaskList(homeStore: HomeStore): Promise<void> {
-  let dayInfo = await DayInfoApi.queryByKey(homeStore.currentDate);
-  if (dayInfo === null) {
-    // if this info is null, init to default value.
-    dayInfo = new DayInfo(homeStore.currentDate, 0, 0);
-  }
-  homeStore.weekList[homeStore.selectedDay] = dayInfo;
-
-  let dateStr = homeStore.currentDate;
-  let taskList: DayTaskInfo[] = await DayTaskInfoApi.queryDayTaskInfo(dateStr);
-  if (taskList.length === 0) {
-    // The task list is empty on this day: prefill it in-memory with the repeating opened tasks only.
-    // Today-only tasks are seeded only on the day they were opened, so they are excluded here.
-    let repeatTaskList = await TaskInfoApi.queryRepeatTaskInfo();
-    for (let repeatTask of repeatTaskList) {
-      taskList.push(repeatTask.convert2DefaultDayTask(dateStr))
-    }
-  }
-  homeStore.taskList = taskList;
+export async function updateTaskList(homeStore: HomeStore): Promise<HomeStore> {
+  return await initCurrentDateInfo(convertStr2Date(homeStore.currentDate));
 }
 
 /*

@@ -52,6 +52,14 @@ class DayTaskInfoApi implements TableApi<DayTaskInfo> {
   }
 
   async batchInsert(dataList: DayTaskInfo[]): Promise<number> {
+    // relationalStore.batchInsert with an empty array throws synchronously
+    // (param validation), which escapes the .then().catch() chain, rejects
+    // initDayInfo, and leaves HomeComponent.aboutToAppear stuck before
+    // flag=true — so the home page renders blank. Short-circuit empty lists.
+    if (dataList.length === 0) {
+      hilog.info(0x0000, TAG, 'Batch insert is skipped, dataList is empty');
+      return 0;
+    }
     let result: number = -1;
     const valueBucketList: relationalStore.ValuesBucket[] = [];
     for (let data of dataList) {

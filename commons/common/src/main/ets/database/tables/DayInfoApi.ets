@@ -284,7 +284,20 @@ class DayInfoApi implements TableApi<DayInfo> {
         finTaskNum++;
       }
     }
-    let result = await this.updateByKey(date, taskListOfOpen.length, finTaskNum);
+    let targetTaskNum = taskListOfOpen.length;
+    // Upsert the dayInfo row. updateByKey only UPDATEs; if the row is missing
+    // (e.g. initDayInfo's insert was skipped because the RDB connection was not
+    // ready yet on a cold start), the UPDATE affects 0 rows but still reports
+    // "success", leaving the day permanently at 0% progress. Insert the row
+    // first when it does not exist so the progress can actually be persisted.
+    let result: boolean;
+    let existing: DayInfo | null = await this.queryByKey(date);
+    if (existing === null) {
+      let rowId: number = await this.insert(new DayInfo(date, targetTaskNum, finTaskNum));
+      result = rowId !== -1;
+    } else {
+      result = await this.updateByKey(date, targetTaskNum, finTaskNum);
+    }
     // Update service card information synchronously when tasks change.
     FormUtils.updateForms();
     return result;

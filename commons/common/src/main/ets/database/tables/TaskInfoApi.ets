@@ -56,6 +56,12 @@ class TaskInfoApi implements TableApi<TaskInfo> {
   }
 
   async batchInsert(dataList: TaskInfo[]): Promise<number> {
+    // Short-circuit empty lists: relationalStore.batchInsert([]) throws
+    // synchronously and escapes the promise chain (see DayTaskInfoApi.batchInsert).
+    if (dataList.length === 0) {
+      hilog.info(0x0000, TAG, 'Batch insert is skipped, dataList is empty');
+      return 0;
+    }
     let result: number = -1;
     const valueBucketList: relationalStore.ValuesBucket[] = [];
     for (let data of dataList) {
