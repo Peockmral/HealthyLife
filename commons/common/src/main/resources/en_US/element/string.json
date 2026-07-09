@@ -125,6 +125,18 @@
       "value": "Edit task"
     },
     {
+      "name": "delete_task",
+      "value": "Delete"
+    },
+    {
+      "name": "delete_task_confirm",
+      "value": "Are you sure to delete this task?"
+    },
+    {
+      "name": "task_deleted",
+      "value": "Deleted"
+    },
+    {
       "name": "task_opened",
       "value": "Opened"
     },

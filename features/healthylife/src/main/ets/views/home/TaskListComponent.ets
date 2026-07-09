@@ -15,12 +15,17 @@
  *
  */
 
-import { HomeStore } from '../../viewmodel/HomeStore';
+import { HomeStore, updateTaskList } from '../../viewmodel/HomeStore';
 import { AchievementStore } from '../../viewmodel/AchievementStore';
 import TaskInfoApi from 'common/src/main/ets/database/tables/TaskInfoApi';
 import { openTaskClockCustomDialog } from '../dialog/TaskClockCustomDialog';
 import { TaskInfoDialogParams } from '../../viewmodel/dialog/TaskInfoDialogParams';
-import { CommonConstants as Const, DayTaskInfo, taskBaseInfoList } from 'common';
+import {
+  AgentUtils,
+  CommonConstants as Const,
+  DayTaskInfo,
+  taskBaseInfoList
+} from 'common';
 
 @Component
 export struct TaskListComponent {
@@ -101,12 +106,62 @@ export struct TaskListComponent {
         openTaskClockCustomDialog(this.getUIContext(), params);
       }
     })
-    .gesture(LongPressGesture().onAction(async () => {
-      if (this.homeStore.checkCurrentDay()) {
+    .gesture(LongPressGesture().onAction(() => {
+      if (!this.homeStore.checkCurrentDay()) {
+        return;
+      }
+      this.openTaskActionMenu(item);
+    }))
+  }
+
+  /*
+   * Pop up an action menu after long-pressing a task, providing edit and delete options.
+   */
+  private openTaskActionMenu(item: DayTaskInfo) {
+    this.getUIContext().getPromptAction().showActionMenu({
+      title: taskBaseInfoList[item.taskId].name,
+      buttons: [
+        { text: $r('app.string.edit_task'), color: $r('sys.color.font_primary') },
+        { text: $r('app.string.delete_task'), color: $r('sys.color.font_primary') }
+      ]
+    }).then(async (result) => {
+      if (result.index === 0) {
+        // edit the task.
         let taskInfo = await TaskInfoApi.queryByKey(item.taskId);
         this.pageStack.pushPath({ name: 'EditTaskComponent', param: taskInfo });
+      } else if (result.index === 1) {
+        // delete the task.
+        await this.confirmDeleteTask(item);
       }
-    }))
+    })
+  }
+
+  /*
+   * Confirm and delete the task from the page and the database.
+   */
+  private async confirmDeleteTask(item: DayTaskInfo) {
+    let dialogResult = await this.getUIContext().getPromptAction().showDialog({
+      title: $r('app.string.delete_task'),
+      message: $r('app.string.delete_task_confirm'),
+      buttons: [
+        { text: $r('app.string.cancel'), color: $r('sys.color.font_secondary') },
+        { text: $r('app.string.confirm'), color: $r('sys.color.font_primary') }
+      ],
+      alignment: DialogAlignment.Center
+    });
+    if (dialogResult.index !== 1) {
+      return;
+    }
+
+    // delete the reminder agent if the task owns one (time-based tasks only).
+    let taskInfo = await TaskInfoApi.queryByKey(item.taskId);
+    if (taskInfo && taskBaseInfoList[item.taskId].unit === '' && taskInfo.reminderId !== -1) {
+      AgentUtils.deleteAgent(taskInfo.reminderId);
+    }
+
+    await TaskInfoApi.deleteTask(this.homeStore.currentDate, item.taskId);
+    await updateTaskList(this.homeStore);
+    this.getUIContext().getPromptAction().showToast({ message: $r('app.string.task_deleted') });
   }
 
   @Builder

@@ -384,6 +384,45 @@ class TaskInfoApi implements TableApi<TaskInfo> {
   }
 
   /*
+   * Delete the task from the day list and close it synchronously.
+   * The task is marked as closed so it will not be re-added on the following days,
+   * and the day task record of the day is removed so it disappears from the page.
+   * @param { string } date date of the day.
+   * @param { number } taskId id of the task.
+   * @returns { Promise<boolean> } whether it was successful or not.
+   */
+  async deleteTask(date: string, taskId: number): Promise<boolean> {
+    let oldTaskInfo = await this.queryByKey(taskId);
+    if (!oldTaskInfo) {
+      return false;
+    }
+
+    let result = true;
+    // mark the task as closed so it will not be re-added on the following days.
+    if (oldTaskInfo.isOpen) {
+      let closeSql = `UPDATE ${TABLE_NAME} SET isOpen = false, finValue = "" WHERE taskId = ${taskId}`
+      result = await RdbUtils.executeSql(closeSql);
+      if (!result) {
+        return result;
+      }
+    }
+
+    // remove the day task record of the day so the task disappears from the page.
+    let key = await DayTaskInfoApi.queryKeyByDateAndTaskId(date, taskId);
+    if (key !== -1) {
+      result = await DayTaskInfoApi.delete(key);
+      if (!result) {
+        return result;
+      }
+    }
+
+    // Synchronously modify the number of information tasks for the day.
+    result = await DayInfoApi.updateDayByTaskStatus(date);
+
+    return result;
+  }
+
+  /*
    * Clock the task and update the relevant information synchronously.
    * @param { string } date date of the day.
    * @param { number } taskId id of the task.

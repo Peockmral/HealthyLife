@@ -125,6 +125,18 @@
       "value": "编辑任务"
     },
     {
+      "name": "delete_task",
+      "value": "删除"
+    },
+    {
+      "name": "delete_task_confirm",
+      "value": "确定删除该任务吗？"
+    },
+    {
+      "name": "task_deleted",
+      "value": "已删除"
+    },
+    {
       "name": "task_opened",
       "value": "已开启"
     },
