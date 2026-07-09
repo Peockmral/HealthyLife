@@ -1,0 +1,24 @@
+{
+  "routerMap": [
+    {
+      "name": "HomeComponent",
+      "pageSourceFile": "src/main/ets/views/HomeComponent.ets",
+      "buildFunction": "homeBuilder"
+    },
+    {
+      "name": "AddTaskComponent",
+      "pageSourceFile": "src/main/ets/views/task/AddTaskComponent.ets",
+      "buildFunction": "addTaskBuilder"
+    },
+    {
+      "name": "EditTaskComponent",
+      "pageSourceFile": "src/main/ets/views/task/EditTaskComponent.ets",
+      "buildFunction": "editTaskBuilder"
+    },
+    {
+      "name": "AchievementComponent",
+      "pageSourceFile": "src/main/ets/views/AchievementComponent.ets",
+      "buildFunction": "achBuilder"
+    }
+  ]
+}
