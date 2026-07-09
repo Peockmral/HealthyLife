@@ -211,8 +211,7 @@ class DayInfoApi implements TableApi<DayInfo> {
 
     if (currentDayInfo) {
       // current day info exist, check day and task info Whether it is complete.
-      let queryDayTaskSql = `SELECT * FROM dayTaskInfo WHERE date = ${date} ORDER BY taskId`;
-      let dayTaskList: DayTaskInfo[] = await DayTaskInfoApi.query(queryDayTaskSql);
+      let dayTaskList: DayTaskInfo[] = await DayTaskInfoApi.queryDayTaskInfo(date);
       if (taskListOfOpen.length !== dayTaskList.length) {
         // day and task info partially missing, identify missing information and insert it.
         let exitsIndex: number[] = [];

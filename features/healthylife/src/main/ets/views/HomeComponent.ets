@@ -15,7 +15,8 @@
  *
  */
 
-import { CommonConstants as Const } from 'common';
+import { CommonConstants as Const, convertDate2Str } from 'common';
+import DayInfoApi from 'common/src/main/ets/database/tables/DayInfoApi';
 import { HomeTopComponent } from './home/HomeTopComponent';
 import { TaskListComponent } from './home/TaskListComponent';
 import { AchievementStore } from '../viewmodel/AchievementStore';
@@ -36,6 +37,9 @@ export struct HomeComponent {
   private scroller: Scroller = new Scroller();
 
   async aboutToAppear() {
+    // Initialize the day info (seed dayTaskInfo for opened tasks) before reading,
+    // so the home list reflects opened tasks even on a fresh install / new day.
+    await DayInfoApi.initDayInfo(convertDate2Str(new Date()));
     this.homeStore = await initCurrentDateInfo(new Date());
     this.flag = true;
   }

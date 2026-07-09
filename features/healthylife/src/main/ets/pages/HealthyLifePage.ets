@@ -18,8 +18,7 @@
 import { HomeComponent } from '../views/HomeComponent';
 import { MineComponent } from '../views/MineComponent';
 import { NavList, TabId } from '../model/NavItemModel';
-import { CommonConstants as Const, convertDate2Str } from 'common';
-import DayInfoApi from 'common/src/main/ets/database/tables/DayInfoApi';
+import { CommonConstants as Const } from 'common';
 import { AchievementStore, initAchievementStore } from '../viewmodel/AchievementStore';
 import { HomeStore } from '../viewmodel/HomeStore';
 import { common } from '@kit.AbilityKit';
@@ -43,7 +42,6 @@ export struct HealthyLifePage {
     } catch (error) {
       console.error(`an error occurred: ${error}`);
     }
-    await DayInfoApi.initDayInfo(convertDate2Str(new Date()));
     this.achievementStore = await initAchievementStore();
   }
 
