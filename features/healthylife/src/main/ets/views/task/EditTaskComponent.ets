@@ -76,9 +76,33 @@ export struct EditTaskComponent {
             await DayTaskInfoApi.update(key, this.taskInfo.convert2DayTask(this.homeStore.currentDate));
           })
         if (this.taskBaseInfo.unit === '') {
-          // update agent alerts
-          AgentUtils.updateAgent(this.taskInfo, this.taskBaseInfo, this.getUIContext());
-          hilog.info(0x0000, TAG, `update reminderId successed, reminderId is ${this.taskInfo.reminderId}`);
+          if (this.taskInfo.reminderId === -1) {
+            // Reminder was never created (permission denied / publish failed earlier).
+            // Self-heal: reclaim quota, request permission, and publish a fresh reminder
+            // instead of calling updateAgent(-1), which would always fail.
+            let isRequestSuccess = await RequestAuthorization.requestNotification(this.getUIContext());
+            if (isRequestSuccess) {
+              await AgentUtils.cleanupGhostReminders(await TaskInfoApi.queryAllReminderIds());
+              let reminderId = await AgentUtils.creatAgent(this.taskInfo, this.taskBaseInfo, this.getUIContext());
+              this.taskInfo.reminderId = reminderId;
+              await TaskInfoApi.update(this.taskInfo.taskId, this.taskInfo);
+              if (reminderId === -1) {
+                hilog.error(0x0000, TAG, `self-heal creatAgent returned -1, taskId=${this.taskInfo.taskId}`);
+              } else {
+                hilog.info(0x0000, TAG, `self-heal created reminderId ${reminderId}`);
+              }
+            } else {
+              hilog.error(0x0000, TAG, `self-heal: notification permission denied, taskId=${this.taskInfo.taskId}`);
+              this.getUIContext().getPromptAction().showToast({
+                message: $r('app.string.reminder_no_notification_permission'),
+                duration: 3000
+              });
+            }
+          } else {
+            // update agent alerts
+            AgentUtils.updateAgent(this.taskInfo, this.taskBaseInfo, this.getUIContext());
+            hilog.info(0x0000, TAG, `update reminderId successed, reminderId is ${this.taskInfo.reminderId}`);
+          }
         }
       }
       // The repeat option was turned from on to off: cancel the task on every subsequent day
@@ -99,12 +123,29 @@ export struct EditTaskComponent {
           if (oldTaskInfo) {
             let isRequestSuccess = await RequestAuthorization.requestNotification(this.getUIContext());
             if (isRequestSuccess) {
+              // Reclaim quota occupied by ghost reminders (reinstalls / failed cancels)
+              // before publishing, otherwise publishReminder fails with 1700002.
+              await AgentUtils.cleanupGhostReminders(await TaskInfoApi.queryAllReminderIds());
               let reminderId = await AgentUtils.creatAgent(this.taskInfo, this.taskBaseInfo, this.getUIContext());
               // update reminderId
               oldTaskInfo.reminderId = reminderId;
               await TaskInfoApi.update(oldTaskInfo.taskId, oldTaskInfo);
-              hilog.info(0x0000, TAG, `create reminderId successed, reminderId is ${reminderId}`);
+              if (reminderId === -1) {
+                hilog.error(0x0000, TAG,
+                  `creatAgent returned -1, reminder NOT published. taskId=${this.taskInfo.taskId}`);
+              } else {
+                hilog.info(0x0000, TAG, `create reminderId successed, reminderId is ${reminderId}`);
+              }
+            } else {
+              hilog.error(0x0000, TAG,
+                `requestNotification returned false, reminder skipped. taskId=${this.taskInfo.taskId}`);
+              this.getUIContext().getPromptAction().showToast({
+                message: $r('app.string.reminder_no_notification_permission'),
+                duration: 3000
+              });
             }
+          } else {
+            hilog.error(0x0000, TAG, `queryByKey returned null, cannot create reminder. taskId=${this.taskInfo.taskId}`);
           }
         }
       } else {
@@ -114,7 +155,11 @@ export struct EditTaskComponent {
           let taskInfo = await TaskInfoApi.queryByKey(this.taskInfo.taskId);
           if (taskInfo && taskInfo.reminderId !== -1) {
             AgentUtils.deleteAgent(taskInfo.reminderId);
-            hilog.info(0x0000, TAG, `delete reminderId successed, reminderId is ${taskInfo.reminderId}`);
+            // Clear the stored id so it is not treated as a tracked (active) reminder
+            // by cleanupGhostReminders; the system reminder has just been cancelled.
+            taskInfo.reminderId = -1;
+            await TaskInfoApi.update(taskInfo.taskId, taskInfo);
+            hilog.info(0x0000, TAG, `delete reminderId successed, reminderId is reset to -1`);
           }
         }
       }

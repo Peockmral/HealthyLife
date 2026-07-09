@@ -323,6 +323,43 @@ class TaskInfoApi implements TableApi<TaskInfo> {
   }
 
   /*
+   * Query the reminderIds tracked by currently opened tasks.
+   * Used to tell which system reminders are legitimately ours so that ghost reminders
+   * (left over from reinstalls or failed cancels, which fill the reminder quota and cause
+   * publishReminder error 1700002) can be cancelled without nuking active task reminders.
+   * @returns { Promise<number[]> } tracked reminder ids (excludes -1 / unset).
+   */
+  async queryAllReminderIds(): Promise<number[]> {
+    let result: number[] = [];
+    let predicates = new relationalStore.RdbPredicates(TABLE_NAME);
+    predicates.equalTo('isOpen', true);
+    await RdbUtils.rdbStore?.query(predicates).then((resultSet: relationalStore.ResultSet) => {
+      while (resultSet.goToNextRow()) {
+        let reminderId = resultSet.getValue(resultSet.getColumnIndex('reminderId')) as number;
+        if (reminderId !== undefined && reminderId !== -1) {
+          result.push(reminderId);
+        }
+      }
+      resultSet.close();
+      hilog.info(0x0000, TAG, `Query all reminderIds is successful, result is ${result}`);
+    }).catch((err: BusinessError) => {
+      hilog.error(0x0000, TAG, `Query all reminderIds is failed, code is ${err.code}, message is ${err.message}`);
+    });
+    return result;
+  }
+
+  /*
+   * Reset every task's stored reminderId to -1.
+   * Used after cancelAllReminders() (the nuclear recovery for emulator quota-counter
+   * desync, error 1700002) so that other open time-tasks self-heal on their next edit
+   * instead of calling updateReminder on a now-stale id.
+   * @returns { Promise<boolean> } whether it was successful.
+   */
+  async resetAllReminderIds(): Promise<boolean> {
+    return await RdbUtils.executeSql(`UPDATE ${TABLE_NAME} SET reminderId = -1`);
+  }
+
+  /*
    * Close every opened today-only (non-repeating) task.
    * Called when a new day begins so that tasks opened as "today only" do not propagate to the new day
    * and the add-task page stays consistent (no longer shown as opened).

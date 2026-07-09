@@ -153,6 +153,14 @@
       "value": "On: every following day; off: stops next day"
     },
     {
+      "name": "reminder_no_notification_permission",
+      "value": "Notification permission denied; reminder not created"
+    },
+    {
+      "name": "reminder_publish_failed",
+      "value": "Failed to create reminder; check notification permission"
+    },
+    {
       "name": "complete",
       "value": "Complete"
     },

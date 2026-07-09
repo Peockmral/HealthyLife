@@ -24,5 +24,6 @@ struct Index {
     Column() {
       HealthyLifePage()
     }
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 }

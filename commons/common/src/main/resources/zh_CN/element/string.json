@@ -153,6 +153,14 @@
       "value": "开启后加入之后每一天；关闭后次日取消"
     },
     {
+      "name": "reminder_no_notification_permission",
+      "value": "未开启通知权限，无法创建提醒"
+    },
+    {
+      "name": "reminder_publish_failed",
+      "value": "提醒创建失败，请检查通知权限"
+    },
+    {
       "name": "complete",
       "value": "完成"
     },

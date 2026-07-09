@@ -69,7 +69,7 @@ export struct HomeTopComponent {
 
       WeekCalendarComponent()
     }
-    .height(Const.THOUSANDTH_500)
+    .height(Const.THOUSANDTH_560)
     .backgroundImage($r('app.media.ic_home_bg'))
     .backgroundImagePosition({
       x: $r('app.float.default_0'),

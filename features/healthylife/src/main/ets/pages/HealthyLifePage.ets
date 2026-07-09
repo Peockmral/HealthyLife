@@ -64,9 +64,6 @@ export struct HealthyLifePage {
       .height(Const.THOUSANDTH_1000)
       .barWidth(Const.THOUSANDTH_940)
       .vertical(false)
-      .padding({
-        bottom: $r('app.float.default_20')
-      })
       .divider({
         strokeWidth: 1,
         color: $r('sys.color.background_tertiary')
@@ -76,6 +73,8 @@ export struct HealthyLifePage {
       })
     }
     .mode(NavigationMode.Stack)
+    .hideTitleBar(true)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 
   @Builder
