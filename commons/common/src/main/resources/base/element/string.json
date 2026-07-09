@@ -145,6 +145,14 @@
       "value": "Target setting"
     },
     {
+      "name": "task_repeat_daily",
+      "value": "Repeat daily"
+    },
+    {
+      "name": "task_repeat_daily_desc",
+      "value": "On: every following day; off: stops next day"
+    },
+    {
       "name": "complete",
       "value": "Complete"
     },

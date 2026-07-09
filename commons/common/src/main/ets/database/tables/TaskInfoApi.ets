@@ -178,6 +178,9 @@ class TaskInfoApi implements TableApi<TaskInfo> {
         case 'reminderId':
           valueBucket[name] = data.reminderId;
           break;
+        case 'isRepeat':
+          valueBucket[name] = data.isRepeat;
+          break;
         default:
           break;
       }
@@ -197,11 +200,18 @@ class TaskInfoApi implements TableApi<TaskInfo> {
       const alertEndTime = resultSet.getValue(resultSet.getColumnIndex('alertEndTime')) as string;
       const alertFrequency = resultSet.getValue(resultSet.getColumnIndex('alertFrequency')) as string;
       const reminderId = resultSet.getValue(resultSet.getColumnIndex('reminderId')) as number;
+      let isRepeat = false;
+      try {
+        isRepeat = resultSet.getValue(resultSet.getColumnIndex('isRepeat')) ? true : false;
+      } catch (error) {
+        // isRepeat column may be absent on legacy databases before migration completes.
+        hilog.error(0x0000, TAG, `isRepeat column missing, defaulting to false: ${error}`);
+      }
       return new TaskInfo(taskId, isOpen, targetValue, finValue, isDone, isAlert, alertStartTime, alertEndTime,
-        alertFrequency, reminderId);
+        alertFrequency, reminderId, isRepeat);
     } catch (error) {
       hilog.error(0x0000, TAG, `an error occurred: ${error}`);
-      return new TaskInfo(-1, false, '', '', false, false, '', '', '', -1);
+      return new TaskInfo(-1, false, '', '', false, false, '', '', '', -1, false);
     }
 
   }
@@ -284,6 +294,57 @@ class TaskInfoApi implements TableApi<TaskInfo> {
   }
 
   /*
+   * query the list of opened and repeating task information.
+   * Only repeating tasks are seeded on future/new days; today-only tasks stay on the day they were opened.
+   * @returns { Promise<TaskInfo[]> } opened and repeating task list.
+   */
+  async queryRepeatTaskInfo(): Promise<TaskInfo[]> {
+    let result: TaskInfo[] = [];
+    let predicates = new relationalStore.RdbPredicates(TABLE_NAME);
+    predicates.equalTo('isOpen', true);
+    predicates.equalTo('isRepeat', true);
+    predicates.orderByAsc(PRIMARY_KEY)
+    await RdbUtils.rdbStore?.query(predicates).then((resultSet: relationalStore.ResultSet) => {
+      if (resultSet.rowCount === 0) {
+        hilog.info(0x0000, TAG, `Query repeat task is failed, query result is empty`);
+        resultSet.close();
+        return;
+      }
+      while (resultSet.goToNextRow()) {
+        result.push(this.convertResultSet2Entity(resultSet));
+      }
+      resultSet.close();
+      hilog.info(0x0000, TAG, `Query repeat task is successful, query result is ${result.toString()}`);
+      resultSet.close();
+    }).catch((err: BusinessError) => {
+      hilog.error(0x0000, TAG, `Query repeat task is failed, code is ${err.code}, message is ${err.message}`);
+    });
+    return result;
+  }
+
+  /*
+   * Close every opened today-only (non-repeating) task.
+   * Called when a new day begins so that tasks opened as "today only" do not propagate to the new day
+   * and the add-task page stays consistent (no longer shown as opened).
+   * @returns { Promise<boolean> } whether it was successful or not.
+   */
+  async closeNonRepeatTasks(): Promise<boolean> {
+    let closeSql = `UPDATE ${TABLE_NAME} SET isOpen = false WHERE isOpen = true AND isRepeat = false`
+    return await RdbUtils.executeSql(closeSql);
+  }
+
+  /*
+   * Add the isRepeat column for legacy databases created before this feature existed.
+   * No-op (returns false, caught) when the column already exists, e.g. on fresh installs where the
+   * create-table statement already includes it. Existing rows default to false (today-only).
+   * @returns { Promise<boolean> } whether the column was added.
+   */
+  async migrateIsRepeat(): Promise<boolean> {
+    return await RdbUtils.executeSql(
+      `ALTER TABLE ${TABLE_NAME} ADD COLUMN isRepeat boolean not null default 0`);
+  }
+
+  /*
    * initialize all tasks to an incomplete state.
    * @returns { Promise<boolean> } initialization succeeded.
    */
@@ -302,9 +363,10 @@ class TaskInfoApi implements TableApi<TaskInfo> {
    * Open the task and update the relevant information synchronously.
    * @param { string } date date of the day.
    * @param { number } taskId id of the task.
+   * @param { boolean } isRepeat whether the task should be added to every subsequent day.
    * @returns { Promise<boolean> } whether it was successful or not.
    */
-  async openTask(date: string, taskId: number): Promise<boolean> {
+  async openTask(date: string, taskId: number, isRepeat: boolean): Promise<boolean> {
     // Determine whether the task is open.
     let oldTaskInfo = await this.queryByKey(taskId);
     if (!oldTaskInfo) {
@@ -315,9 +377,10 @@ class TaskInfoApi implements TableApi<TaskInfo> {
       return true;
     }
 
-    // modify the current task to open.
+    // modify the current task to open, and persist the repeat flag.
     let result = true;
-    let openTaskSql = `UPDATE ${TABLE_NAME} SET isOpen = true, finValue = "" WHERE taskId = ${taskId}`
+    let openTaskSql =
+      `UPDATE ${TABLE_NAME} SET isOpen = true, finValue = "", isRepeat = ${isRepeat} WHERE taskId = ${taskId}`
     result = await RdbUtils.executeSql(openTaskSql);
     if (!result) {
       return result;

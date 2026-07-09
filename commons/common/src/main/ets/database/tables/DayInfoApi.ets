@@ -207,10 +207,10 @@ class DayInfoApi implements TableApi<DayInfo> {
   async initDayInfo(date: string): Promise<boolean> {
     let result = -1;
     let currentDayInfo: DayInfo | null = await this.queryByKey(date);
-    let taskListOfOpen: TaskInfo[] = await TaskInfoApi.queryOpenedTaskInfo();
 
     if (currentDayInfo) {
       // current day info exist, check day and task info Whether it is complete.
+      let taskListOfOpen: TaskInfo[] = await TaskInfoApi.queryOpenedTaskInfo();
       let dayTaskList: DayTaskInfo[] = await DayTaskInfoApi.queryDayTaskInfo(date);
       if (taskListOfOpen.length !== dayTaskList.length) {
         // day and task info partially missing, identify missing information and insert it.
@@ -239,6 +239,8 @@ class DayInfoApi implements TableApi<DayInfo> {
 
     // Current day info not exist, it means that the application is opened for the first time that day, and all tasks are initialized to not done.
     await TaskInfoApi.initAllTask();
+    // Close every opened today-only (non-repeating) task so it does not propagate to the new day.
+    await TaskInfoApi.closeNonRepeatTasks();
 
     // current day info not exist, generate the default information of the day and insert.
     result = await this.insert(new DayInfo(date, 0, 0));
@@ -248,10 +250,13 @@ class DayInfoApi implements TableApi<DayInfo> {
     }
     hilog.info(0x0000, TAG, `Init current day info successed, date is ${date}`);
 
-    // After initializing the current day's information, add the opened task information to the current day's task information.
+    // After initializing the current day's information, add the repeating opened tasks to the current
+    // day's task information. Today-only tasks are intentionally excluded: they only apply to the day
+    // they were opened on, which has now passed.
+    let taskListOfRepeat: TaskInfo[] = await TaskInfoApi.queryRepeatTaskInfo();
     let dayTaskInfoList: DayTaskInfo[] = [];
-    for (let taskOfOpen of taskListOfOpen) {
-      dayTaskInfoList.push(taskOfOpen.convert2DefaultDayTask(date));
+    for (let taskOfRepeat of taskListOfRepeat) {
+      dayTaskInfoList.push(taskOfRepeat.convert2DefaultDayTask(date));
     }
     result = await DayTaskInfoApi.batchInsert(dayTaskInfoList)
     if (result === -1) {

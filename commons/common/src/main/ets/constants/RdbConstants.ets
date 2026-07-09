@@ -52,7 +52,9 @@ export class RdbConstants {
     new ColumnInfo('alertStartTime', 'text', -1, true, false, false),
     new ColumnInfo('alertEndTime', 'text', -1, true, false, false),
     new ColumnInfo('alertFrequency', 'text', -1, true, false, false),
-    new ColumnInfo('reminderId', 'integer', -1, true, false, false)
+    new ColumnInfo('reminderId', 'integer', -1, true, false, false),
+    // whether the task repeats every subsequent day (isOpen && isRepeat tasks are seeded on future/new days)
+    new ColumnInfo('isRepeat', 'boolean', -1, false, false, false)
   ];
   // column information for database tables of day and task info
   static readonly COLUMNS_OF_DAY_TASK: ColumnInfo[] = [

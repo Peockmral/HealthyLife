@@ -55,7 +55,7 @@ function targetValueStyle(isOpen: boolean, pickerType: PickerType) {
 export struct EditTaskComponent {
   @Consume('pathStack') pageStack: NavPathStack;
   @Consume homeStore: HomeStore;
-  @Provide taskInfo: TaskInfo = new TaskInfo(0, false, '', '', false, false, '', '', '', -1);
+  @Provide taskInfo: TaskInfo = new TaskInfo(0, false, '', '', false, false, '', '', '', -1, false);
   @Provide taskBaseInfo: TaskBaseInfo = taskBaseInfoList[this.taskInfo.taskId];
   originalInfo: TaskInfo = this.taskInfo;
 
@@ -81,6 +81,11 @@ export struct EditTaskComponent {
           hilog.info(0x0000, TAG, `update reminderId successed, reminderId is ${this.taskInfo.reminderId}`);
         }
       }
+      // The repeat option was turned from on to off: cancel the task on every subsequent day
+      // (from the next day on). Today's record is kept so the task still applies today.
+      if (this.originalInfo.isRepeat && !this.taskInfo.isRepeat) {
+        await DayTaskInfoApi.deleteFutureTaskInfo(this.homeStore.currentDate, this.taskInfo.taskId);
+      }
     } else {
       // the task status has changed, need to update the task information before modifying the task status.
       this.taskInfo.isOpen = this.originalInfo.isOpen;
@@ -88,7 +93,7 @@ export struct EditTaskComponent {
         await TaskInfoApi.update(this.taskInfo.taskId, this.taskInfo);
       }
       if (!this.taskInfo.isOpen) {
-        await TaskInfoApi.openTask(this.homeStore.currentDate, this.taskInfo.taskId);
+        await TaskInfoApi.openTask(this.homeStore.currentDate, this.taskInfo.taskId, this.taskInfo.isRepeat);
         if (this.taskBaseInfo.unit === '') {
           let oldTaskInfo = await TaskInfoApi.queryByKey(this.taskInfo.taskId);
           if (oldTaskInfo) {
@@ -185,6 +190,45 @@ export struct EditTaskComponent {
             let params = new TargetSettingDialogParams(this.taskInfo, this.taskBaseInfo);
             openTargetSettingCustomDialog(this.getUIContext(), params);
           }
+        })
+
+        Row() {
+          Column() {
+            Text($r('app.string.task_repeat_daily'))
+              .fontColor($r('sys.color.font_primary'))
+              .fontSize($r('app.float.default_18'))
+              .fontWeight(FontWeight.Medium)
+
+            Text($r('app.string.task_repeat_daily_desc'))
+              .fontColor($r('sys.color.font_tertiary'))
+              .fontSize($r('app.float.default_12'))
+              .maxLines(2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .margin({ top: $r('app.float.default_4') })
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start)
+
+          Toggle({
+            type: ToggleType.Switch,
+            isOn: this.taskInfo.isRepeat
+          })
+            .width($r('app.float.default_36'))
+            .height($r('app.float.default_20'))
+            .enabled(this.taskInfo.isOpen)
+            .onChange((isOn) => {
+              this.taskInfo.isRepeat = isOn;
+            })
+        }
+        .width(Const.THOUSANDTH_940)
+        .height($r('app.float.default_72'))
+        .borderRadius($r('app.float.default_16'))
+        .backgroundColor($r('sys.color.background_primary'))
+        .alignItems(VerticalAlign.Center)
+        .justifyContent(FlexAlign.SpaceBetween)
+        .padding({
+          left: $r('app.float.default_12'),
+          right: $r('app.float.default_12')
         })
 
         Button() {

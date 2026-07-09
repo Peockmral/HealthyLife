@@ -68,10 +68,11 @@ export async function initCurrentDateInfo(date: Date): Promise<HomeStore> {
   let dateStr = convertDate2Str(date);
   let taskList: DayTaskInfo[] = await DayTaskInfoApi.queryDayTaskInfo(dateStr);
   if (taskList.length === 0 && date > new Date()) {
-    // If the task list is empty on the current day, the current date is greater than the system date, and the task information needs to be initialized and populated.
-    let openedTaskList = await TaskInfoApi.queryOpenedTaskInfo();
-    for (let openedTask of openedTaskList) {
-      taskList.push(openedTask.convert2DefaultDayTask(dateStr))
+    // The day is in the future and has no persisted records yet: prefill it in-memory with the
+    // repeating opened tasks only. Today-only tasks must not appear on future days.
+    let repeatTaskList = await TaskInfoApi.queryRepeatTaskInfo();
+    for (let repeatTask of repeatTaskList) {
+      taskList.push(repeatTask.convert2DefaultDayTask(dateStr))
     }
   }
   return new HomeStore(weekList, selectedDay + Const.WEEK_DAY_NUM, dateStr, taskList);
@@ -93,10 +94,11 @@ export async function updateTaskList(homeStore: HomeStore): Promise<void> {
   let dateStr = homeStore.currentDate;
   let taskList: DayTaskInfo[] = await DayTaskInfoApi.queryDayTaskInfo(dateStr);
   if (taskList.length === 0) {
-    // If the task list is empty on the current day, the current date is greater than the system date, and the task information needs to be initialized and populated.
-    let openedTaskList = await TaskInfoApi.queryOpenedTaskInfo();
-    for (let openedTask of openedTaskList) {
-      taskList.push(openedTask.convert2DefaultDayTask(dateStr))
+    // The task list is empty on this day: prefill it in-memory with the repeating opened tasks only.
+    // Today-only tasks are seeded only on the day they were opened, so they are excluded here.
+    let repeatTaskList = await TaskInfoApi.queryRepeatTaskInfo();
+    for (let repeatTask of repeatTaskList) {
+      taskList.push(repeatTask.convert2DefaultDayTask(dateStr))
     }
   }
   homeStore.taskList = taskList;

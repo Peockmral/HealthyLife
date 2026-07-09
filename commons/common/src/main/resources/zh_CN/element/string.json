@@ -145,6 +145,14 @@
       "value": "目标设置"
     },
     {
+      "name": "task_repeat_daily",
+      "value": "之后每天加入"
+    },
+    {
+      "name": "task_repeat_daily_desc",
+      "value": "开启后加入之后每一天；关闭后次日取消"
+    },
+    {
       "name": "complete",
       "value": "完成"
     },

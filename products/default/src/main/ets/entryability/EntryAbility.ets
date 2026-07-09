@@ -40,6 +40,8 @@ export default class EntryAbility extends UIAbility {
         RdbUtils.createTable(tableName);
       }
     });
+    // Add the isRepeat column for legacy databases (no-op on fresh installs where create-table already includes it).
+    await TaskInfoApi.migrateIsRepeat();
     await TaskInfoApi.checkDefaultTask();
     // Init preferences and get store
     await PreferencesUtils.getPreferencesFromStorage(this.context);

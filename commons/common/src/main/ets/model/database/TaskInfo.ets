@@ -28,9 +28,11 @@ export class TaskInfo {
   alertEndTime: string;
   alertFrequency: string;
   reminderId: number;
+  // whether the task should be added to every subsequent day (today-only when false)
+  isRepeat: boolean;
 
   constructor(taskId: number, isOpen: boolean, targetValue: string, finValue: string, isDone: boolean, isAlert: boolean,
-    alertStartTime: string, alertEndTime: string, alertFrequency: string, reminderId: number) {
+    alertStartTime: string, alertEndTime: string, alertFrequency: string, reminderId: number, isRepeat: boolean) {
     this.taskId = taskId;
     this.isOpen = isOpen;
     this.targetValue = targetValue;
@@ -41,6 +43,7 @@ export class TaskInfo {
     this.alertEndTime = alertEndTime;
     this.alertFrequency = alertFrequency;
     this.reminderId = reminderId
+    this.isRepeat = isRepeat;
   }
 
   toString(): string {
@@ -54,7 +57,8 @@ export class TaskInfo {
       `alertStartTime: ${this.alertStartTime}, ` +
       `alertEndTime: ${this.alertEndTime}, ` +
       `alertFrequency: ${this.alertFrequency}, ` +
-      `reminderId: ${this.reminderId}` +
+      `reminderId: ${this.reminderId}, ` +
+      `isRepeat: ${this.isRepeat}` +
       `]`;
   }
 
@@ -69,7 +73,8 @@ export class TaskInfo {
       this.alertStartTime,
       this.alertEndTime,
       this.alertFrequency,
-      this.reminderId
+      this.reminderId,
+      this.isRepeat
     );
   }
 
@@ -84,6 +89,7 @@ export class TaskInfo {
       && this.alertEndTime === otherTask.alertEndTime
       && this.alertFrequency === otherTask.alertFrequency
       && this.reminderId === otherTask.reminderId
+      && this.isRepeat === otherTask.isRepeat
   }
 
   convert2DayTask(date: string): DayTaskInfo {
@@ -96,10 +102,10 @@ export class TaskInfo {
 }
 
 export const defaultTaskInfoList: TaskInfo[] = [
-  new TaskInfo(0, false, '08:00', '', false, false, '', '', '', -1),
-  new TaskInfo(1, false, '1', '', false, false, '', '', '', -1),
-  new TaskInfo(2, false, '1', '', false, false, '', '', '', -1),
-  new TaskInfo(3, false, '1', '', false, false, '', '', '', -1),
-  new TaskInfo(4, false, '1', '', false, false, '', '', '', -1),
-  new TaskInfo(5, false, '23:00', '', false, false, '', '', '', -1)
+  new TaskInfo(0, false, '08:00', '', false, false, '', '', '', -1, false),
+  new TaskInfo(1, false, '1', '', false, false, '', '', '', -1, false),
+  new TaskInfo(2, false, '1', '', false, false, '', '', '', -1, false),
+  new TaskInfo(3, false, '1', '', false, false, '', '', '', -1, false),
+  new TaskInfo(4, false, '1', '', false, false, '', '', '', -1, false),
+  new TaskInfo(5, false, '23:00', '', false, false, '', '', '', -1, false)
 ];

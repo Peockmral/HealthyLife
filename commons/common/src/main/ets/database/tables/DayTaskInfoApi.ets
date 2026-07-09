@@ -215,6 +215,31 @@ class DayTaskInfoApi implements TableApi<DayTaskInfo> {
   }
 
   /*
+   * Delete every persisted day-task record of the given task that falls after the given date.
+   * Used when a repeating task is switched to today-only so that, from the next day on, the task is
+   * cancelled on every subsequent day. Date strings are zero-padded YYYYMMDD, so lexicographic
+   * comparison matches chronological order.
+   * @param { string } date the boundary date (exclusive); records with date > this are removed.
+   * @param { number } taskId id of the task.
+   * @returns { Promise<boolean> } whether it was successful or not.
+   */
+  async deleteFutureTaskInfo(date: string, taskId: number): Promise<boolean> {
+    let result = true;
+    let predicates = new relationalStore.RdbPredicates(TABLE_NAME);
+    predicates.greaterThan('date', date);
+    predicates.equalTo('taskId', taskId);
+    await RdbUtils.rdbStore?.delete(predicates).then((rows: number) => {
+      hilog.info(0x0000, TAG,
+        `Delete future task info is successful, date is ${date}, taskId is ${taskId}, affected rows is ${rows}`);
+    }).catch((err: BusinessError) => {
+      hilog.error(0x0000, TAG,
+        `Delete future task info is failed, date is ${date}, taskId is ${taskId}, code is ${err.code}, message is ${err.message}`);
+      result = false;
+    });
+    return result;
+  }
+
+  /*
    * query the list of opened task information.
    * @returns { Promise<TaskInfo[]> } opened task list.
    */
