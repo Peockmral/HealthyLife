@@ -117,6 +117,11 @@ export class CommonConstants {
     '4',
     '5'
   ];
+  static readonly PICKER_RANGE_TIMES: string[] = [
+    '1',
+    '2',
+    '3'
+  ];
   // achievement info
   static readonly ACHIEVEMENT_STORE: string = 'achievementStore';
   static readonly MAX_CONSECUTIVE_DAYS: string = 'maxConsecutiveDays';
