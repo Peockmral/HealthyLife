@@ -93,6 +93,18 @@
       "value": "Was done"
     },
     {
+      "name": "day_task_progress",
+      "value": "Today's progress"
+    },
+    {
+      "name": "no_day_task",
+      "value": "No tasks enabled today"
+    },
+    {
+      "name": "close",
+      "value": "Close"
+    },
+    {
       "name": "my_achievement",
       "value": "My achievement"
     },

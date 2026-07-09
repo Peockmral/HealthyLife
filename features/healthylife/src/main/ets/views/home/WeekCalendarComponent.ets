@@ -17,6 +17,8 @@
 
 import { HomeStore, initCurrentDateInfo } from '../../viewmodel/HomeStore';
 import { CommonConstants as Const, convertStr2Date, DayInfo, formatSystemTime } from 'common';
+import { openDayTaskProgressDialog } from '../dialog/DayTaskProgressDialog';
+import { DayTaskProgressDialogParams } from '../../viewmodel/dialog/DayTaskProgressDialogParams';
 
 @Component
 export struct WeekCalendarComponent {
@@ -152,6 +154,12 @@ export struct WeekCalendarComponent {
     .justifyContent(FlexAlign.SpaceBetween)
     .onClick(async () => {
       if (this.homeStore.selectedDay === index) {
+        // Clicking the already-selected day: only today pops the progress dialog;
+        // other selected days remain a no-op so the page switching logic is unchanged.
+        if (this.homeStore.checkCurrentDay()) {
+          openDayTaskProgressDialog(this.getUIContext(),
+            new DayTaskProgressDialogParams(this.homeStore.currentDate, this.homeStore.taskList));
+        }
         return;
       }
       const diffDay = index - this.homeStore.selectedDay;

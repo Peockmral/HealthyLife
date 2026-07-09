@@ -93,6 +93,18 @@
       "value": "已完成"
     },
     {
+      "name": "day_task_progress",
+      "value": "今日进度"
+    },
+    {
+      "name": "no_day_task",
+      "value": "今天还没有开启的任务"
+    },
+    {
+      "name": "close",
+      "value": "关闭"
+    },
+    {
       "name": "my_achievement",
       "value": "我的成就"
     },
