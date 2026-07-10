@@ -339,6 +339,10 @@
     {
       "name": "select_date",
       "value": "Select Date"
+    },
+    {
+      "name": "already_latest_version",
+      "value": "Already the latest version"
     }
   ]
 }

@@ -339,6 +339,10 @@
     {
       "name": "select_date",
       "value": "选择日期"
+    },
+    {
+      "name": "already_latest_version",
+      "value": "已经是最新版本"
     }
   ]
 }

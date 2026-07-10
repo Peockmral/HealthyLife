@@ -92,6 +92,9 @@ export struct MineComponent {
         .margin({
           bottom: $r('app.float.default_6')
         })
+        .onClick(() => {
+          this.getUIContext().getPromptAction().showToast({ message: $r('app.string.already_latest_version') });
+        })
 
         Row({ space: $r('app.float.default_16') }) {
           Image($r('app.media.star_trophy'))
