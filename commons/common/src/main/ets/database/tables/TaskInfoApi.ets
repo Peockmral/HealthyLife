@@ -423,7 +423,7 @@ class TaskInfoApi implements TableApi<TaskInfo> {
     // modify the current task to open, and persist the repeat flag.
     let result = true;
     let openTaskSql =
-      `UPDATE ${TABLE_NAME} SET isOpen = true, finValue = "", isRepeat = ${isRepeat} WHERE taskId = ${taskId}`
+      `UPDATE ${TABLE_NAME} SET isOpen = true, finValue = "", isDone = false, isRepeat = ${isRepeat} WHERE taskId = ${taskId}`
     result = await RdbUtils.executeSql(openTaskSql);
     if (!result) {
       return result;
@@ -506,7 +506,7 @@ class TaskInfoApi implements TableApi<TaskInfo> {
     let result = true;
     // mark the task as closed so it will not be re-added on the following days.
     if (oldTaskInfo.isOpen) {
-      let closeSql = `UPDATE ${TABLE_NAME} SET isOpen = false, finValue = "" WHERE taskId = ${taskId}`
+      let closeSql = `UPDATE ${TABLE_NAME} SET isOpen = false, finValue = "", isDone = false WHERE taskId = ${taskId}`
       result = await RdbUtils.executeSql(closeSql);
       if (!result) {
         return result;
