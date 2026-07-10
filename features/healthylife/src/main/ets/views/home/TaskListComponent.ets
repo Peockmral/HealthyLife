@@ -16,7 +16,7 @@
  */
 
 import { HomeStore, updateTaskList } from '../../viewmodel/HomeStore';
-import { AchievementStore } from '../../viewmodel/AchievementStore';
+import { AchievementStore, updateAchievementStore } from '../../viewmodel/AchievementStore';
 import TaskInfoApi from 'common/src/main/ets/database/tables/TaskInfoApi';
 import { openTaskClockCustomDialog } from '../dialog/TaskClockCustomDialog';
 import { TaskInfoDialogParams } from '../../viewmodel/dialog/TaskInfoDialogParams';
@@ -105,6 +105,10 @@ export struct TaskListComponent {
         let params = new TaskInfoDialogParams(item, this.homeStore, this.achievementStore, this.getUIContext(),
           async () => {
             this.homeStore = await updateTaskList(this.homeStore);
+          },
+          async () => {
+            const newStore = await updateAchievementStore(params);
+            this.achievementStore = newStore;
           });
         openTaskClockCustomDialog(this.getUIContext(), params);
       }

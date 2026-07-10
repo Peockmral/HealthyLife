@@ -33,13 +33,19 @@ export class TaskInfoDialogParams {
   // mutations (only @ObjectLink does), so mutating homeStore.weekList/taskList in
   // place would never refresh the UI.
   refreshHomeStore: () => Promise<void>;
+  // Invoked after updateAchievementStore returns a new AchievementStore instance.
+  // Reassigns the @Consume achievementStore reference in TaskListComponent so the
+  // UI refreshes (same pattern as refreshHomeStore above).
+  refreshAchievementStore: () => Promise<void>;
 
   constructor(dayTaskInfo: DayTaskInfo, homeStore: HomeStore, achievementStore: AchievementStore,
-    uIContext: UIContext, refreshHomeStore: () => Promise<void>) {
+    uIContext: UIContext, refreshHomeStore: () => Promise<void>,
+    refreshAchievementStore: () => Promise<void>) {
     this.dayTaskInfo = dayTaskInfo;
     this.homeStore = homeStore;
     this.achievementStore = achievementStore;
     this.uIContext = uIContext;
     this.refreshHomeStore = refreshHomeStore;
+    this.refreshAchievementStore = refreshAchievementStore;
   }
 }

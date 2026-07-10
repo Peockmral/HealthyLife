@@ -17,7 +17,7 @@
 
 import { JSON } from '@kit.ArkTS';
 import { CommonConstants as Const } from 'common';
-import { getAchievementDoneIndex } from '../model/AchievementModel';
+import { getNewlyUnlockedAchievementIndices } from '../model/AchievementModel';
 import { TaskInfoDialogParams } from './dialog/TaskInfoDialogParams';
 import { PreferencesUtils } from 'common/src/main/ets/utils/PreferencesUtils';
 import { openAchievementCustomDialog } from '../views/dialog/AchievementDialog';
@@ -52,31 +52,45 @@ export async function initAchievementStore() {
 /*
  * Update the information when the achievement information changes.
  * @param { TaskInfoDialogParams } params Task info for clock custom dialog parameters.
+ * @returns { Promise<AchievementStore> } A new AchievementStore instance with updated values.
  */
-export async function updateAchievementStore(params: TaskInfoDialogParams) {
+export async function updateAchievementStore(params: TaskInfoDialogParams): Promise<AchievementStore> {
   //Judge whether all tasks are completed that day, and return if not.
   const dayInfo = params.homeStore.weekList[params.homeStore.selectedDay];
   if (dayInfo.finTaskNum < dayInfo.targetTaskNum || params.achievementStore.currentDayStatus) {
-    return;
+    return new AchievementStore(params.achievementStore.maxConsecutiveDays,
+      params.achievementStore.currentConsecutiveDays, params.achievementStore.currentDayStatus);
   }
 
-  // If all tasks have been completed that day, the number of consecutive days of completion is added to the user preferences.
-  params.achievementStore.currentConsecutiveDays += 1;
-  await PreferencesUtils.putPreference(Const.CURRENT_CONSECUTIVE_DAYS,
-    String(params.achievementStore.currentConsecutiveDays));
-  params.achievementStore.currentDayStatus = true;
-  await PreferencesUtils.putPreference(Const.CURRENT_DAY_STATUS, String(params.achievementStore.currentDayStatus));
+  // Record the old max before any updates.
+  const oldMax = params.achievementStore.maxConsecutiveDays;
 
-  // Determine whether the current number of consecutive days exceeds the maximum number of consecutive days.
-  if (params.achievementStore.currentConsecutiveDays > params.achievementStore.maxConsecutiveDays) {
-    // If it exceeds, synchronize the global storage and user preference content to update.
-    params.achievementStore.maxConsecutiveDays = params.achievementStore.currentConsecutiveDays;
-    await PreferencesUtils.putPreference(Const.MAX_CONSECUTIVE_DAYS,
-      String(params.achievementStore.maxConsecutiveDays));
-    // Get the achievement for a specified number of days, and if so, open a pop-up window to display the achievement animation.
-    const achievementDoneIndex = getAchievementDoneIndex(params.achievementStore.maxConsecutiveDays);
-    if (achievementDoneIndex !== -1) {
-      openAchievementCustomDialog(params.uIContext, achievementDoneIndex);
+  // Calculate the new values locally — do NOT mutate params.achievementStore in place.
+  let newCurrentConsecutiveDays = params.achievementStore.currentConsecutiveDays + 1;
+  await PreferencesUtils.putPreference(Const.CURRENT_CONSECUTIVE_DAYS, String(newCurrentConsecutiveDays));
+
+  let newCurrentDayStatus = true;
+  await PreferencesUtils.putPreference(Const.CURRENT_DAY_STATUS, String(newCurrentDayStatus));
+
+  let newMaxConsecutiveDays = params.achievementStore.maxConsecutiveDays;
+  if (newCurrentConsecutiveDays > newMaxConsecutiveDays) {
+    newMaxConsecutiveDays = newCurrentConsecutiveDays;
+    await PreferencesUtils.putPreference(Const.MAX_CONSECUTIVE_DAYS, String(newMaxConsecutiveDays));
+
+    // Get all newly unlocked achievement indices and open dialogs with staggered timing.
+    const newlyUnlockedIndices = getNewlyUnlockedAchievementIndices(oldMax, newMaxConsecutiveDays);
+    for (let i = 0; i < newlyUnlockedIndices.length; i++) {
+      const idx = newlyUnlockedIndices[i];
+      const delay = i * 1500;
+      if (delay === 0) {
+        openAchievementCustomDialog(params.uIContext, idx);
+      } else {
+        setTimeout(() => {
+          openAchievementCustomDialog(params.uIContext, idx);
+        }, delay);
+      }
     }
   }
+
+  return new AchievementStore(newMaxConsecutiveDays, newCurrentConsecutiveDays, newCurrentDayStatus);
 }

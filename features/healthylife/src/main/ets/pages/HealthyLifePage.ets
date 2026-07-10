@@ -21,6 +21,8 @@ import { NavList, TabId } from '../model/NavItemModel';
 import { CommonConstants as Const } from 'common';
 import { AchievementStore, initAchievementStore } from '../viewmodel/AchievementStore';
 import { HomeStore } from '../viewmodel/HomeStore';
+import { ProfileStore, initProfileStore } from '../viewmodel/ProfileStore';
+import { UserProfile } from '../model/UserProfile';
 import { common } from '@kit.AbilityKit';
 
 @Component
@@ -29,6 +31,7 @@ export struct HealthyLifePage {
   @Provide achievementStore: AchievementStore = new AchievementStore(0, 0, false);
   @Provide('pathStack') pageStack: NavPathStack = new NavPathStack();
   @Provide homeStore: HomeStore = new HomeStore([], -1, '', []);
+  @Provide profileStore: ProfileStore = new ProfileStore(new UserProfile('', '', 0, '', 0, 0));
   private context = this.getUIContext()?.getHostContext() as common.UIAbilityContext;
   private windowClass = this.context.windowStage.getMainWindowSync();
 
@@ -43,6 +46,7 @@ export struct HealthyLifePage {
       console.error(`an error occurred: ${error}`);
     }
     this.achievementStore = await initAchievementStore();
+    this.profileStore = await initProfileStore();
   }
 
   build() {

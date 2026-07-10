@@ -251,6 +251,94 @@
     {
       "name": "monthly_checkin",
       "value": "Monthly Check-in"
+    },
+    {
+      "name": "profile_title",
+      "value": "Personal Data"
+    },
+    {
+      "name": "label_avatar",
+      "value": "Avatar"
+    },
+    {
+      "name": "label_nickname",
+      "value": "Nickname"
+    },
+    {
+      "name": "label_gender",
+      "value": "Gender"
+    },
+    {
+      "name": "label_birthday",
+      "value": "Birthday"
+    },
+    {
+      "name": "label_height",
+      "value": "Height"
+    },
+    {
+      "name": "label_weight",
+      "value": "Weight"
+    },
+    {
+      "name": "not_set",
+      "value": "Not set"
+    },
+    {
+      "name": "save",
+      "value": "Save"
+    },
+    {
+      "name": "select_from_gallery",
+      "value": "Select from Gallery"
+    },
+    {
+      "name": "gender_male",
+      "value": "Male"
+    },
+    {
+      "name": "gender_female",
+      "value": "Female"
+    },
+    {
+      "name": "unit_cm",
+      "value": "cm"
+    },
+    {
+      "name": "unit_kg",
+      "value": "kg"
+    },
+    {
+      "name": "nickname_empty_error",
+      "value": "Nickname cannot be empty"
+    },
+    {
+      "name": "edit_nickname",
+      "value": "Edit Nickname"
+    },
+    {
+      "name": "edit_avatar",
+      "value": "Edit Avatar"
+    },
+    {
+      "name": "select_gender",
+      "value": "Select Gender"
+    },
+    {
+      "name": "edit_birthday",
+      "value": "Edit Birthday"
+    },
+    {
+      "name": "edit_height",
+      "value": "Edit Height"
+    },
+    {
+      "name": "edit_weight",
+      "value": "Edit Weight"
+    },
+    {
+      "name": "select_date",
+      "value": "Select Date"
     }
   ]
 }

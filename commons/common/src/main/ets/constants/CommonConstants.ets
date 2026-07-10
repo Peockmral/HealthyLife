@@ -134,6 +134,14 @@ export class CommonConstants {
   static readonly MAX_CONSECUTIVE_DAYS: string = 'maxConsecutiveDays';
   static readonly CURRENT_CONSECUTIVE_DAYS: string = 'currentConsecutiveDays';
   static readonly CURRENT_DAY_STATUS: string = 'currentDayStatus';
+  // profile info
+  static readonly USER_AVATAR_URI: string = 'userAvatarUri';
+  static readonly USER_NICKNAME: string = 'userNickname';
+  static readonly USER_GENDER: string = 'userGender';
+  static readonly USER_BIRTHDAY: string = 'userBirthday';
+  static readonly USER_HEIGHT: string = 'userHeight';
+  static readonly USER_WEIGHT: string = 'userWeight';
+  static readonly PROFILE_STORE: string = 'profileStore';
   // menu info
   static readonly DEFAULT_MENU_INFO: Resource[] = [
     $r('app.string.mine_personal_data'),

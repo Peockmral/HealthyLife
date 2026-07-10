@@ -16,20 +16,39 @@
  */
 
 import { CommonConstants as Const } from 'common';
+import { ProfileStore } from '../../viewmodel/ProfileStore';
 
 @Reusable
 @Component
 export struct UserInfoComponent {
+  @Consume profileStore: ProfileStore;
+
   build() {
     Row({ space: $r('app.float.default_12') }) {
-      Image($r('app.media.person_crop_circle'))
-        .width($r('app.float.default_48'))
-        .height($r('app.float.default_48'))
+      if (this.profileStore.userProfile.avatarUri !== '') {
+        Image(this.profileStore.userProfile.avatarUri)
+          .width($r('app.float.default_48'))
+          .height($r('app.float.default_48'))
+          .borderRadius('50%')
+          .clip(true)
+          .objectFit(ImageFit.Cover)
+      } else {
+        Image($r('app.media.person_crop_circle'))
+          .width($r('app.float.default_48'))
+          .height($r('app.float.default_48'))
+      }
 
-      Text($r('app.string.user_name'))
-        .fontColor($r('app.color.mine_font_color'))
-        .fontSize($r('app.float.default_18'))
-        .fontWeight(FontWeight.Medium)
+      if (this.profileStore.userProfile.nickname !== '') {
+        Text(this.profileStore.userProfile.nickname)
+          .fontColor($r('app.color.mine_font_color'))
+          .fontSize($r('app.float.default_18'))
+          .fontWeight(FontWeight.Medium)
+      } else {
+        Text($r('app.string.not_set'))
+          .fontColor($r('app.color.mine_font_color'))
+          .fontSize($r('app.float.default_18'))
+          .fontWeight(FontWeight.Medium)
+      }
     }
     .width(Const.THOUSANDTH_940)
     .height(Const.THOUSANDTH_130)

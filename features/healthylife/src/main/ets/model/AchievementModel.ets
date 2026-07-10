@@ -77,3 +77,19 @@ export function getAchievementDoneIndex(maxConsecutiveDays: number): number {
   }
   return -1;
 }
+
+/*
+ * Gets indices of all newly unlocked achievements when maxConsecutiveDays increases.
+ * @param { number } oldMax The previous maximum number of consecutive days.
+ * @param { number } newMax The new maximum number of consecutive days.
+ * @returns { number[] } Indices of AchievementList items where level > oldMax && level <= newMax, sorted low to high.
+ */
+export function getNewlyUnlockedAchievementIndices(oldMax: number, newMax: number): number[] {
+  const indices: number[] = [];
+  for (let index = 0; index < AchievementList.length; index++) {
+    if (AchievementList[index].level > oldMax && AchievementList[index].level <= newMax) {
+      indices.push(index);
+    }
+  }
+  return indices;
+}

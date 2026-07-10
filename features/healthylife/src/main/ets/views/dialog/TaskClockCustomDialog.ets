@@ -17,7 +17,6 @@
 
 import { ComponentContent } from '@kit.ArkUI';
 import TaskInfoApi from 'common/src/main/ets/database/tables/TaskInfoApi';
-import { updateAchievementStore } from '../../viewmodel/AchievementStore';
 import { TaskInfoDialogParams } from '../../viewmodel/dialog/TaskInfoDialogParams';
 import { CommonConstants as Const, PromptActionClass, taskBaseInfoList } from 'common';
 
@@ -81,7 +80,9 @@ async function taskClock(params: TaskInfoDialogParams) {
   PromptActionClass.closeDialog();
 
   // After the check-in is completed, determine whether all the tasks of the day are completed and update the achievement information.
+  // refreshAchievementStore calls updateAchievementStore internally and assigns the new instance
+  // to trigger @Consume reference change in TaskListComponent.
   if (!params.dayTaskInfo.isDone) {
-    await updateAchievementStore(params);
+    await params.refreshAchievementStore();
   }
 }

@@ -17,11 +17,13 @@
 
 import { CommonConstants as Const } from 'common';
 import { UserInfoComponent } from './mine/UserInfoComponent';
+import { ProfileStore } from '../viewmodel/ProfileStore';
 
 @Component
 export struct MineComponent {
   @Provide uiContext: UIContext = this.getUIContext();
   @Consume('pathStack') pageStack: NavPathStack;
+  @Consume profileStore: ProfileStore;
 
   build() {
     Navigation() {
@@ -54,6 +56,9 @@ export struct MineComponent {
         .backgroundColor($r('sys.color.background_primary'))
         .margin({
           top: $r('app.float.default_6')
+        })
+        .onClick(() => {
+          this.pageStack.pushPathByName('PersonalDataComponent', '');
         })
 
         Divider()

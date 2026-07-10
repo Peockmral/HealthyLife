@@ -251,6 +251,94 @@
     {
       "name": "monthly_checkin",
       "value": "月度打卡"
+    },
+    {
+      "name": "profile_title",
+      "value": "个人资料"
+    },
+    {
+      "name": "label_avatar",
+      "value": "头像"
+    },
+    {
+      "name": "label_nickname",
+      "value": "昵称"
+    },
+    {
+      "name": "label_gender",
+      "value": "性别"
+    },
+    {
+      "name": "label_birthday",
+      "value": "出生日期"
+    },
+    {
+      "name": "label_height",
+      "value": "身高"
+    },
+    {
+      "name": "label_weight",
+      "value": "体重"
+    },
+    {
+      "name": "not_set",
+      "value": "未设置"
+    },
+    {
+      "name": "save",
+      "value": "保存"
+    },
+    {
+      "name": "select_from_gallery",
+      "value": "从图库选择"
+    },
+    {
+      "name": "gender_male",
+      "value": "男"
+    },
+    {
+      "name": "gender_female",
+      "value": "女"
+    },
+    {
+      "name": "unit_cm",
+      "value": "厘米"
+    },
+    {
+      "name": "unit_kg",
+      "value": "千克"
+    },
+    {
+      "name": "nickname_empty_error",
+      "value": "昵称不能为空"
+    },
+    {
+      "name": "edit_nickname",
+      "value": "编辑昵称"
+    },
+    {
+      "name": "edit_avatar",
+      "value": "编辑头像"
+    },
+    {
+      "name": "select_gender",
+      "value": "选择性别"
+    },
+    {
+      "name": "edit_birthday",
+      "value": "编辑出生日期"
+    },
+    {
+      "name": "edit_height",
+      "value": "编辑身高"
+    },
+    {
+      "name": "edit_weight",
+      "value": "编辑体重"
+    },
+    {
+      "name": "select_date",
+      "value": "选择日期"
     }
   ]
 }

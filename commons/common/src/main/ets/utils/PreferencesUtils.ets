@@ -50,6 +50,25 @@ export class PreferencesUtils {
         if (!PreferencesUtils.storePreferences.hasSync(Const.CURRENT_DAY_STATUS)) {
           await PreferencesUtils.putPreference(Const.CURRENT_DAY_STATUS, String(false));
         }
+        // initialize profile keys
+        if (!PreferencesUtils.storePreferences.hasSync(Const.USER_AVATAR_URI)) {
+          await PreferencesUtils.putPreference(Const.USER_AVATAR_URI, '');
+        }
+        if (!PreferencesUtils.storePreferences.hasSync(Const.USER_NICKNAME)) {
+          await PreferencesUtils.putPreference(Const.USER_NICKNAME, '');
+        }
+        if (!PreferencesUtils.storePreferences.hasSync(Const.USER_GENDER)) {
+          await PreferencesUtils.putPreference(Const.USER_GENDER, '0');
+        }
+        if (!PreferencesUtils.storePreferences.hasSync(Const.USER_BIRTHDAY)) {
+          await PreferencesUtils.putPreference(Const.USER_BIRTHDAY, '');
+        }
+        if (!PreferencesUtils.storePreferences.hasSync(Const.USER_HEIGHT)) {
+          await PreferencesUtils.putPreference(Const.USER_HEIGHT, '0');
+        }
+        if (!PreferencesUtils.storePreferences.hasSync(Const.USER_WEIGHT)) {
+          await PreferencesUtils.putPreference(Const.USER_WEIGHT, '0');
+        }
         hilog.info(0x0000, TAG, `Succeeded to init the preferences info, options is ${Const.ACHIEVEMENT_STORE}`);
       }
     } catch (error) {

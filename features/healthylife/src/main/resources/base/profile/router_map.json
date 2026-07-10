@@ -19,6 +19,41 @@
       "name": "AchievementComponent",
       "pageSourceFile": "src/main/ets/views/AchievementComponent.ets",
       "buildFunction": "achBuilder"
+    },
+    {
+      "name": "PersonalDataComponent",
+      "pageSourceFile": "src/main/ets/views/mine/PersonalDataComponent.ets",
+      "buildFunction": "personalDataBuilder"
+    },
+    {
+      "name": "AvatarEditComponent",
+      "pageSourceFile": "src/main/ets/views/profile/AvatarEditComponent.ets",
+      "buildFunction": "avatarEditBuilder"
+    },
+    {
+      "name": "NicknameEditComponent",
+      "pageSourceFile": "src/main/ets/views/profile/NicknameEditComponent.ets",
+      "buildFunction": "nicknameEditBuilder"
+    },
+    {
+      "name": "GenderSelectComponent",
+      "pageSourceFile": "src/main/ets/views/profile/GenderSelectComponent.ets",
+      "buildFunction": "genderSelectBuilder"
+    },
+    {
+      "name": "BirthdayEditComponent",
+      "pageSourceFile": "src/main/ets/views/profile/BirthdayEditComponent.ets",
+      "buildFunction": "birthdayEditBuilder"
+    },
+    {
+      "name": "HeightEditComponent",
+      "pageSourceFile": "src/main/ets/views/profile/HeightEditComponent.ets",
+      "buildFunction": "heightEditBuilder"
+    },
+    {
+      "name": "WeightEditComponent",
+      "pageSourceFile": "src/main/ets/views/profile/WeightEditComponent.ets",
+      "buildFunction": "weightEditBuilder"
     }
   ]
 }
