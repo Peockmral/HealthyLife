@@ -107,5 +107,6 @@ export const defaultTaskInfoList: TaskInfo[] = [
   new TaskInfo(2, false, '1', '', false, false, '', '', '', -1, false),
   new TaskInfo(3, false, '1', '', false, false, '', '', '', -1, false),
   new TaskInfo(4, false, '1', '', false, false, '', '', '', -1, false),
-  new TaskInfo(5, false, '23:00', '', false, false, '', '', '', -1, false)
+  new TaskInfo(5, false, '23:00', '', false, false, '', '', '', -1, false),
+  new TaskInfo(6, false, '1', '', false, false, '', '', '', -1, false)
 ];

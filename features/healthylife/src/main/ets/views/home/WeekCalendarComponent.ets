@@ -19,6 +19,8 @@ import { HomeStore, initCurrentDateInfo } from '../../viewmodel/HomeStore';
 import { CommonConstants as Const, convertStr2Date, DayInfo, formatSystemTime } from 'common';
 import { openDayTaskProgressDialog } from '../dialog/DayTaskProgressDialog';
 import { DayTaskProgressDialogParams } from '../../viewmodel/dialog/DayTaskProgressDialogParams';
+import { openMonthlyCheckinDialog } from '../dialog/MonthlyCheckinDialog';
+import { MonthlyCheckinDialogParams } from '../../viewmodel/dialog/MonthlyCheckinDialogParams';
 
 @Component
 export struct WeekCalendarComponent {
@@ -93,6 +95,20 @@ export struct WeekCalendarComponent {
           this.symbolBuild($r('sys.symbol.chevron_right'), async () => {
             await this.refreshDateInfo(Const.WEEK_DAY_NUM);
           })
+
+          SymbolGlyph($r('sys.symbol.calendar'))
+            .fontColor([$r('sys.color.icon_secondary')])
+            .fontWeight(FontWeight.Normal)
+            .fontSize($r('app.float.default_22'))
+            .margin({ left: $r('app.float.default_12') })
+            .clickEffect({
+              level: ClickEffectLevel.HEAVY,
+              scale: Const.SYMBOL_GLYPH_CLICK_SCALE
+            })
+            .onClick(() => {
+              openMonthlyCheckinDialog(this.getUIContext(),
+                new MonthlyCheckinDialogParams(this.homeStore.currentDate));
+            })
         }
 
         List({

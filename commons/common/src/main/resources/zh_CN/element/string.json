@@ -237,8 +237,20 @@
       "value": "次"
     },
     {
+      "name": "task_run",
+      "value": "跑步"
+    },
+    {
+      "name": "unit_km",
+      "value": "公里"
+    },
+    {
       "name": "unit_pre_day",
       "value": "/ 天"
+    },
+    {
+      "name": "monthly_checkin",
+      "value": "月度打卡"
     }
   ]
 }

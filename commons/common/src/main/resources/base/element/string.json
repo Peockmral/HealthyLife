@@ -237,8 +237,20 @@
       "value": "times"
     },
     {
+      "name": "task_run",
+      "value": "跑步"
+    },
+    {
+      "name": "unit_km",
+      "value": "公里"
+    },
+    {
       "name": "unit_pre_day",
       "value": "/ day"
+    },
+    {
+      "name": "monthly_checkin",
+      "value": "Monthly Check-in"
     }
   ]
 }

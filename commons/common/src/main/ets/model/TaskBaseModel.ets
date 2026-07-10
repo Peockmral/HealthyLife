@@ -54,5 +54,7 @@ export const taskBaseInfoList: TaskBaseInfo[] = [
   new TaskBaseInfo(4, $r('app.string.task_brush'), $r('app.media.ic_task_brush'),
     $r('app.media.ic_dialog_brush'), $r('app.string.unit_times'), 1, '', PickerType.TEXT, Const.PICKER_RANGE_TIMES),
   new TaskBaseInfo(5, $r('app.string.task_sleep'), $r('app.media.ic_task_sleep'),
-    $r('app.media.ic_dialog_sleep'), '', 0, '20:00 - 23:00', PickerType.TIME, [])
+    $r('app.media.ic_dialog_sleep'), '', 0, '20:00 - 23:00', PickerType.TIME, []),
+  new TaskBaseInfo(6, $r('app.string.task_run'), $r('app.media.ic_task_run'),
+    $r('app.media.ic_dialog_run'), $r('app.string.unit_km'), 1, '', PickerType.TEXT, Const.PICKER_RANGE_RUN)
 ]
