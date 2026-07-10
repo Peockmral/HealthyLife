@@ -23,6 +23,8 @@ import { AchievementStore, initAchievementStore } from '../viewmodel/Achievement
 import { HomeStore } from '../viewmodel/HomeStore';
 import { ProfileStore, initProfileStore } from '../viewmodel/ProfileStore';
 import { UserProfile } from '../model/UserProfile';
+import { AuthUtils } from 'common/src/main/ets/utils/AuthUtils';
+import { LoginComponent } from '../views/auth/LoginComponent';
 import { common } from '@kit.AbilityKit';
 
 @Component
@@ -32,6 +34,7 @@ export struct HealthyLifePage {
   @Provide('pathStack') pageStack: NavPathStack = new NavPathStack();
   @Provide homeStore: HomeStore = new HomeStore([], -1, '', []);
   @Provide profileStore: ProfileStore = new ProfileStore(new UserProfile('', '', 0, '', 0, 0));
+  @Provide isLoggedIn: boolean = false;
   private context = this.getUIContext()?.getHostContext() as common.UIAbilityContext;
   private windowClass = this.context.windowStage.getMainWindowSync();
 
@@ -47,34 +50,39 @@ export struct HealthyLifePage {
     }
     this.achievementStore = await initAchievementStore();
     this.profileStore = await initProfileStore();
+    this.isLoggedIn = await AuthUtils.isLoggedIn();
   }
 
   build() {
     Navigation(this.pageStack) {
-      Tabs({ barPosition: BarPosition.End }) {
-        TabContent() {
-          HomeComponent()
-        }
-        .tabBar(this.tabBuilder(TabId.HOME))
+      if (this.isLoggedIn) {
+        Tabs({ barPosition: BarPosition.End }) {
+          TabContent() {
+            HomeComponent()
+          }
+          .tabBar(this.tabBuilder(TabId.HOME))
 
-        TabContent() {
-          MineComponent()
+          TabContent() {
+            MineComponent()
+          }
+          .tabBar(this.tabBuilder(TabId.MINE))
         }
-        .tabBar(this.tabBuilder(TabId.MINE))
+        .backgroundColor($r('sys.color.background_secondary'))
+        .scrollable(false)
+        .width(Const.THOUSANDTH_1000)
+        .height(Const.THOUSANDTH_1000)
+        .barWidth(Const.THOUSANDTH_940)
+        .vertical(false)
+        .divider({
+          strokeWidth: 1,
+          color: $r('sys.color.background_tertiary')
+        })
+        .onChange((index) => {
+          this.currentIndex = index;
+        })
+      } else {
+        LoginComponent()
       }
-      .backgroundColor($r('sys.color.background_secondary'))
-      .scrollable(false)
-      .width(Const.THOUSANDTH_1000)
-      .height(Const.THOUSANDTH_1000)
-      .barWidth(Const.THOUSANDTH_940)
-      .vertical(false)
-      .divider({
-        strokeWidth: 1,
-        color: $r('sys.color.background_tertiary')
-      })
-      .onChange((index) => {
-        this.currentIndex = index;
-      })
     }
     .mode(NavigationMode.Stack)
     .hideTitleBar(true)

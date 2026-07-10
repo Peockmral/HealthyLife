@@ -18,12 +18,14 @@
 import { CommonConstants as Const } from 'common';
 import { UserInfoComponent } from './mine/UserInfoComponent';
 import { ProfileStore } from '../viewmodel/ProfileStore';
+import { AuthUtils } from 'common/src/main/ets/utils/AuthUtils';
 
 @Component
 export struct MineComponent {
   @Provide uiContext: UIContext = this.getUIContext();
   @Consume('pathStack') pageStack: NavPathStack;
   @Consume profileStore: ProfileStore;
+  @Consume isLoggedIn: boolean;
 
   build() {
     Navigation() {
@@ -124,11 +126,31 @@ export struct MineComponent {
         .onClick(() => {
           this.pageStack.pushPathByName('AchievementComponent', '');
         })
+
+        Button($r('app.string.logout_button'))
+          .width(Const.THOUSANDTH_940)
+          .height(48)
+          .fontSize($r('app.float.default_18'))
+          .type(ButtonType.Capsule)
+          .fontColor($r('sys.color.font_primary'))
+          .backgroundColor($r('sys.color.background_primary'))
+          .margin({
+            top: $r('app.float.default_24')
+          })
+          .onClick(() => {
+            this.handleLogout();
+          })
       }
       .width(Const.THOUSANDTH_1000)
       .height(Const.THOUSANDTH_1000)
     }
     .title($r('app.string.tab_mine'))
     .backgroundColor($r('sys.color.background_secondary'))
+  }
+
+  private async handleLogout(): Promise<void> {
+    this.pageStack.clear();
+    await AuthUtils.setLoggedIn(false);
+    this.isLoggedIn = false;
   }
 }

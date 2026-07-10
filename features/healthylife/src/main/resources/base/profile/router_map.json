@@ -54,6 +54,11 @@
       "name": "WeightEditComponent",
       "pageSourceFile": "src/main/ets/views/profile/WeightEditComponent.ets",
       "buildFunction": "weightEditBuilder"
+    },
+    {
+      "name": "RegisterComponent",
+      "pageSourceFile": "src/main/ets/views/auth/RegisterComponent.ets",
+      "buildFunction": "registerBuilder"
     }
   ]
 }

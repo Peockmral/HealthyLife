@@ -69,6 +69,13 @@ export class PreferencesUtils {
         if (!PreferencesUtils.storePreferences.hasSync(Const.USER_WEIGHT)) {
           await PreferencesUtils.putPreference(Const.USER_WEIGHT, '0');
         }
+        // initialize auth keys
+        if (!PreferencesUtils.storePreferences.hasSync(Const.IS_LOGGED_IN)) {
+          await PreferencesUtils.putPreference(Const.IS_LOGGED_IN, 'false');
+        }
+        if (!PreferencesUtils.storePreferences.hasSync(Const.REGISTERED_USERS)) {
+          await PreferencesUtils.putPreference(Const.REGISTERED_USERS, '{}');
+        }
         hilog.info(0x0000, TAG, `Succeeded to init the preferences info, options is ${Const.ACHIEVEMENT_STORE}`);
       }
     } catch (error) {

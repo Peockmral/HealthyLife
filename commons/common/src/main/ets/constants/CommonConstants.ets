@@ -142,6 +142,9 @@ export class CommonConstants {
   static readonly USER_HEIGHT: string = 'userHeight';
   static readonly USER_WEIGHT: string = 'userWeight';
   static readonly PROFILE_STORE: string = 'profileStore';
+  // auth info
+  static readonly IS_LOGGED_IN: string = 'isLoggedIn';
+  static readonly REGISTERED_USERS: string = 'registeredUsers';
   // menu info
   static readonly DEFAULT_MENU_INFO: Resource[] = [
     $r('app.string.mine_personal_data'),

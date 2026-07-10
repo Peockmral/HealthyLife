@@ -343,6 +343,62 @@
     {
       "name": "already_latest_version",
       "value": "Already the latest version"
+    },
+    {
+      "name": "login_title",
+      "value": "Login"
+    },
+    {
+      "name": "register_title",
+      "value": "Register"
+    },
+    {
+      "name": "username_label",
+      "value": "Username"
+    },
+    {
+      "name": "password_label",
+      "value": "Password"
+    },
+    {
+      "name": "confirm_password_label",
+      "value": "Confirm Password"
+    },
+    {
+      "name": "login_button",
+      "value": "Login"
+    },
+    {
+      "name": "register_button",
+      "value": "Register"
+    },
+    {
+      "name": "logout_button",
+      "value": "Logout"
+    },
+    {
+      "name": "login_failed",
+      "value": "Invalid username or password"
+    },
+    {
+      "name": "password_mismatch",
+      "value": "Passwords do not match"
+    },
+    {
+      "name": "user_exists",
+      "value": "Username already exists"
+    },
+    {
+      "name": "register_success",
+      "value": "Registration successful"
+    },
+    {
+      "name": "username_empty",
+      "value": "Please enter username"
+    },
+    {
+      "name": "password_empty",
+      "value": "Please enter password"
     }
   ]
 }

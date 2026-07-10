@@ -67,9 +67,10 @@ export async function initCurrentDateInfo(date: Date): Promise<HomeStore> {
 
   let dateStr = convertDate2Str(date);
   let taskList: DayTaskInfo[] = await DayTaskInfoApi.queryDayTaskInfo(dateStr);
-  if (taskList.length === 0 && date > new Date()) {
-    // The day is in the future and has no persisted records yet: prefill it in-memory with the
-    // repeating opened tasks only. Today-only tasks must not appear on future days.
+  if (taskList.length === 0) {
+    // The day has no persisted records yet (e.g. a skipped day after a system date
+    // change, or a future day not yet opened): prefill it in-memory with the
+    // repeating opened tasks only. Today-only tasks must not appear on other days.
     let repeatTaskList = await TaskInfoApi.queryRepeatTaskInfo();
     for (let repeatTask of repeatTaskList) {
       taskList.push(repeatTask.convert2DefaultDayTask(dateStr))
